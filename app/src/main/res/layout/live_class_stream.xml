@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/liveStreamContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#090D16">
+
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/playerView"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        app:use_controller="true"
+        app:show_buffering="when_playing"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button 
+        android:id="@+id/btnStartStream" 
+        android:layout_height="wrap_content" 
+        android:layout_marginTop="20dp" 
+        android:layout_width="wrap_content" 
+        android:text="Start Live Class" 
+        android:backgroundTint="#4F46E5"
+        android:textColor="#FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent" 
+        app:layout_constraintStart_toStartOf="parent" 
+        app:layout_constraintTop_toBottomOf="@id/playerView"/>
+
+    <ProgressBar 
+        android:id="@+id/progressBar" 
+        android:layout_height="wrap_content" 
+        android:layout_marginTop="10dp" 
+        android:layout_width="wrap_content" 
+        android:visibility="gone" 
+        app:layout_constraintEnd_toEndOf="parent" 
+        app:layout_constraintStart_toStartOf="parent" 
+        app:layout_constraintTop_toBottomOf="@id/btnStartStream"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

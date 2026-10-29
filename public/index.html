@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="hi" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+  <title>AI TEACH — Your Interactive 3D Tutor & Study Companion</title>
+  <meta name="description" content="AI Teach: इंटरएक्टिव 3D AI ट्यूटर, पीडीएफ गेमीफाइड क्विज़, लाइव क्लासरूम और अनुकूली अध्ययन साथी।" />
+
+  <!-- PWA Primary Manifest & Theming -->
+  <link rel="manifest" href="/public/manifest.json" />
+  <meta name="theme-color" content="#4F46E5" />
+  <meta name="msapplication-TileColor" content="#090D16" />
+
+  <!-- iOS PWA Native Display Support -->
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="AI Teach" />
+  <link rel="apple-touch-icon" href="/public/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="/public/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="/public/icon-512.png" />
+
+  <!-- Favicon / Shortcut Icon -->
+  <link rel="icon" type="image/png" sizes="192x192" href="/public/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/public/icon-192.png" />
+
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    }
+    body {
+      background-color: #090D16;
+      color: #F8FAFC;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-x: hidden;
+    }
+    .header-bar {
+      width: 100%;
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 24px;
+    }
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      object-fit: cover;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.4);
+    }
+    .brand-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #38BDF8, #818CF8, #C084FC);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .install-pwa-btn {
+      display: none; /* Displayed via JavaScript when beforeinstallprompt fires */
+      background: linear-gradient(135deg, #4F46E5, #7C3AED);
+      color: #FFFFFF;
+      border: none;
+      padding: 9px 18px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      border-radius: 20px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(79, 70, 229, 0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .install-pwa-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(79, 70, 229, 0.5);
+    }
+    .hero-container {
+      max-width: 860px;
+      width: 100%;
+      padding: 40px 20px;
+      text-align: center;
+    }
+    .hero-logo-img {
+      max-width: 280px;
+      width: 80%;
+      height: auto;
+      border-radius: 20px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6), 0 0 24px rgba(79, 70, 229, 0.3);
+      margin-bottom: 24px;
+    }
+    .badge {
+      display: inline-block;
+      background: rgba(79, 70, 229, 0.2);
+      border: 1px solid rgba(79, 70, 229, 0.5);
+      color: #A5B4FC;
+      padding: 6px 14px;
+      border-radius: 30px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+      line-height: 1.25;
+    }
+    p.lead {
+      color: #94A3B8;
+      font-size: 1.05rem;
+      max-width: 650px;
+      margin: 0 auto 30px auto;
+      line-height: 1.6;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+      text-align: left;
+    }
+    .feature-card {
+      background: #111827;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 20px;
+    }
+    .feature-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 6px;
+      color: #F1F5F9;
+    }
+    .feature-card p {
+      font-size: 0.9rem;
+      color: #94A3B8;
+      line-height: 1.5;
+    }
+    .instructions-box {
+      background: #1E1B4B;
+      border: 1px solid #4F46E5;
+      border-radius: 16px;
+      padding: 24px;
+      margin-top: 36px;
+      text-align: left;
+    }
+    .instructions-box h2 {
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+      color: #FFFFFF;
+    }
+    .instructions-box ol {
+      padding-left: 20px;
+      color: #CBD5E1;
+      font-size: 0.95rem;
+      line-height: 1.8;
+    }
+  </style>
+
+  <!-- PWA Service Worker Registration & Installation Script -->
+  <script>
+    let deferredPrompt = null;
+
+    // 1. Service Worker को रजिस्टर करें (Offline Caching)
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker
+          .register('/public/service-worker.js')
+          .then((registration) => {
+            console.log('[PWA] Service Worker registered successfully! Scope:', registration.scope);
+          })
+          .catch((error) => {
+            console.error('[PWA] Service Worker registration failed:', error);
+          });
+      });
+    }
+
+    // 2. Browser के डिफ़ॉल्ट प्रॉम्प्ट को इंटरसेप्ट करें और कस्टम बटन दिखाएं
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Browser का स्वतः बैनर रोकें
+      e.preventDefault();
+      deferredPrompt = e;
+      console.log('[PWA] beforeinstallprompt event fired and captured');
+
+      // कस्टम इंस्टॉल बटन को दृश्यमान बनाएं
+      const installBtn = document.getElementById('installPwaBtn');
+      const heroInstallBtn = document.getElementById('heroInstallBtn');
+      if (installBtn) installBtn.style.display = 'inline-block';
+      if (heroInstallBtn) heroInstallBtn.style.display = 'inline-block';
+    });
+
+    // 3. इंस्टॉल ट्रिगर करने वाला फ़ंक्शन
+    function triggerPwaInstall() {
+      if (!deferredPrompt) {
+        alert('ऐप पहले से इंस्टॉल है या ब्राउज़र स्टैंडअलोन मोड में चल रहा है। (App is already installed or running in standalone mode)');
+        return;
+      }
+
+      // देशी इंस्टॉलेशन प्रॉम्प्ट दिखाएं
+      deferredPrompt.prompt();
+
+      // यूज़र की पसंद की प्रतीक्षा करें
+      deferredPrompt.userChoice.then((choiceResult) => {
+        if (choiceResult.outcome === 'accepted') {
+          console.log('[PWA] User accepted the PWA install prompt');
+        } else {
+          console.log('[PWA] User dismissed the PWA install prompt');
+        }
+        deferredPrompt = null;
+      });
+    }
+
+    // 4. ऐप सफलतापूर्वक इंस्टॉल होने पर इवेंट
+    window.addEventListener('appinstalled', (evt) => {
+      console.log('[PWA] AI TEACH App successfully installed on device!');
+      const installBtn = document.getElementById('installPwaBtn');
+      const heroInstallBtn = document.getElementById('heroInstallBtn');
+      if (installBtn) installBtn.style.display = 'none';
+      if (heroInstallBtn) heroInstallBtn.style.display = 'none';
+      alert('बधाई हो! AI TEACH सफलतापूर्वक आपके डेस्कटॉप/मोबाइल पर इंस्टॉल हो गया है।');
+    });
+  </script>
+</head>
+<body>
+  <!-- Header Bar -->
+  <header class="header-bar">
+    <div class="brand-row">
+      <img src="/public/logo.png" alt="AI TEACH Logo" class="brand-logo" />
+      <span class="brand-title">AI TEACH</span>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <a href="/public/AI_Teach_Desktop_App.zip" download="AI_Teach_Desktop_App.zip" class="install-pwa-btn" style="display: inline-block; background: linear-gradient(135deg, #0284C7, #2563EB); text-decoration: none;">
+        💻 Windows App (.zip)
+      </a>
+      <button id="installPwaBtn" class="install-pwa-btn" onclick="triggerPwaInstall()">
+        📥 Install PWA
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Container -->
+  <main class="hero-container">
+    <div class="badge">🚀 PWA & Windows Desktop App Ready</div>
+    <br />
+    <img src="/public/logo.png" alt="AI TEACH - Your Interactive 3D Tutor" class="hero-logo-img" />
+    <h1>AI TEACH — Your Interactive 3D Tutor</h1>
+    <p class="lead">
+      ब्राउज़र से सीधे डेस्कटॉप और मोबाइल पर इंस्टॉल करें (बिना ऐप स्टोर के), अथवा नीचे दिए गए 1-क्लिक विंडोज़ पैकेज (.zip) को डाउनलोड करके चलाएं।
+    </p>
+
+    <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 24px;">
+      <a href="/public/AI_Teach_Brightstep.apk" download="AI_Teach_Brightstep.apk" class="install-pwa-btn" style="display: inline-block; padding: 12px 24px; font-size: 1rem; background: linear-gradient(135deg, #10B981, #059669); text-decoration: none;">
+        🤖 Download Android APK (.apk)
+      </a>
+      <a href="/public/AI_Teach_Project_Source.zip" download="AI_Teach_Project_Source.zip" class="install-pwa-btn" style="display: inline-block; padding: 12px 24px; font-size: 1rem; background: linear-gradient(135deg, #8B5CF6, #6D28D9); text-decoration: none;">
+        📦 Export Project as ZIP (.zip)
+      </a>
+      <a href="/public/AI_Teach_Desktop_App.zip" download="AI_Teach_Desktop_App.zip" class="install-pwa-btn" style="display: inline-block; padding: 12px 24px; font-size: 1rem; background: linear-gradient(135deg, #0284C7, #2563EB); text-decoration: none;">
+        💻 Windows 1-Click App (.zip)
+      </a>
+      <button id="heroInstallBtn" class="install-pwa-btn" style="padding: 12px 24px; font-size: 1rem;" onclick="triggerPwaInstall()">
+        📱 Browser Install (PWA)
+      </button>
+    </div>
+
+    <!-- Core Features Grid -->
+    <div class="features-grid">
+      <div class="feature-card">
+        <h3>🤖 3D AI ट्यूटर (Interactive 3D Avatar)</h3>
+        <p>जीवंत भावभंगिमाओं, आवाज और अनुकूली शिक्षण शैलियों के साथ व्यक्तिगत ट्यूटरिंग।</p>
+      </div>
+      <div class="feature-card">
+        <h3>🎮 पीडीएफ गेमीफाइड क्विज़ (Gamified Quiz)</h3>
+        <p>अपनी पीडीएफ नोट्स अपलोड करें और तत्काल कॉम्बो स्ट्रीक गेमिंग सत्र में सीखें।</p>
+      </div>
+      <div class="feature-card">
+        <h3>🔴 लाइव क्लास एवं प्लेयर (Live Class Stream)</h3>
+        <p>Media3 ExoPlayer द्वारा संचालित एचडी वीडियो लेक्चर और लाइव डाउट सॉल्विंग चैट।</p>
+      </div>
+      <div class="feature-card">
+        <h3>💳 इंस्टामोजो पेमेंट (Instamojo Plans)</h3>
+        <p>प्लान-आधारित फीचर अनलॉकिंग और सख्त 7-दिन का ऑटो-लॉक ट्रायल सिस्टम।</p>
+      </div>
+    </div>
+
+    <!-- PWA Instructions Guide -->
+    <div class="instructions-box">
+      <h2>💡 इसे सीधे डेस्कटॉप या मोबाइल पर कैसे इंस्टॉल करें?</h2>
+      <ol>
+        <li><strong>Google Chrome / Edge (Desktop):</strong> यूआरएल बार में शीर्ष दाईं ओर दिए गए "Install" (📥) आइकन पर क्लिक करें या ऊपर दिए गए 'Install Desktop App' बटन पर टैप करें।</li>
+        <li><strong>Android (Chrome):</strong> शीर्ष दाईं ओर 3-डॉट्स मेनू पर टैप करें और <strong>"Add to Home screen" / "Install app"</strong> चुनें।</li>
+        <li><strong>iOS Safari (iPhone/iPad):</strong> शेयर (Share ⎋) बटन पर टैप करें और <strong>"Add to Home Screen" (होम स्क्रीन पर जोड़ें)</strong> चुनें।</li>
+      </ol>
+    </div>
+  </main>
+</body>
+</html>

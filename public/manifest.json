@@ -1,0 +1,56 @@
+{
+  "name": "AI TEACH — Your Interactive 3D Tutor",
+  "short_name": "AI Teach",
+  "description": "Learn step-by-step with your interactive 3D AI tutor, gamified PDF quizzes, live masterclasses, and adaptive recall.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "orientation": "portrait-primary",
+  "background_color": "#090D16",
+  "theme_color": "#4F46E5",
+  "categories": ["education", "productivity"],
+  "icons": [
+    {
+      "src": "/public/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/public/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/public/logo.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "AI 3D Tutor",
+      "short_name": "Tutor",
+      "description": "Start an interactive 3D AI tutoring session",
+      "url": "/#tutor",
+      "icons": [{ "src": "/public/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Live Masterclass",
+      "short_name": "Live",
+      "description": "Join live lecture streaming masterclasses",
+      "url": "/#live",
+      "icons": [{ "src": "/public/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "PDF Gamified Quiz",
+      "short_name": "PDF Game",
+      "description": "Play gamified study quiz from uploaded PDFs",
+      "url": "/#pdf-game",
+      "icons": [{ "src": "/public/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}

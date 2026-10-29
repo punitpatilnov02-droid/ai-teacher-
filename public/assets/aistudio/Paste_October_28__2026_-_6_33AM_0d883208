@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brightstep Study Companion - AI Tutor</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Phosphor Icons for UI elements -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <!-- Three.js for 3D AI Tutor Simulation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brightstep-dark': '#0B0F19',
+                        'brightstep-panel': '#111827',
+                        'brightstep-primary': '#3B82F6',
+                        'brightstep-accent': '#8B5CF6'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom Scrollbar for Chat */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(17, 24, 39, 0.5); 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151; 
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4B5563; 
+        }
+        
+        /* Glassmorphism utilities */
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Glowing text effect */
+        .text-glow {
+            text-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+        }
+    </style>
+</head>
+<body class="bg-brightstep-dark text-gray-200 font-sans h-screen flex flex-col overflow-hidden selection:bg-brightstep-primary selection:text-white">
+
+    <!-- Top Navigation Bar -->
+    <header class="h-16 glass-panel flex items-center justify-between px-6 z-20 shrink-0 shadow-md">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-brightstep-primary to-brightstep-accent flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.4)]">
+                <i class="ph ph-graduation-cap text-2xl text-white"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg leading-tight tracking-wide text-white">Brightstep</h1>
+                <p class="text-xs text-brightstep-primary font-medium">Study Companion AI</p>
+            </div>
+        </div>
+        
+        <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-gray-400">
+            <a href="#" class="text-white hover:text-brightstep-primary transition-colors flex items-center gap-2">
+                <i class="ph ph-chalkboard-teacher"></i> Dashboard
+            </a>
+            <a href="#" class="hover:text-white transition-colors flex items-center gap-2">
+                <i class="ph ph-books"></i> Library
+            </a>
+            <a href="#" class="hover:text-white transition-colors flex items-center gap-2">
+                <i class="ph ph-chart-line-up"></i> Progress
+            </a>
+        </nav>
+
+        <div class="flex items-center gap-4">
+            <button class="text-gray-400 hover:text-white transition-colors relative">
+                <i class="ph ph-bell text-xl"></i>
+                <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+            <div class="w-8 h-8 rounded-full bg-gray-700 border border-gray-600 flex items-center justify-center cursor-pointer hover:border-brightstep-primary transition-colors">
+                <i class="ph ph-user text-gray-300"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 flex flex-col lg:flex-row gap-6 p-4 lg:p-6 overflow-hidden h-full z-10 relative">
+        
+        <!-- Left/Center Column: AI Tutor & Chat -->
+        <div class="flex-1 flex flex-col gap-6 min-w-0 h-full">
+            
+            <!-- 3D AI Tutor Container -->
+            <div class="relative w-full h-[40vh] lg:h-[55%] rounded-2xl glass-panel overflow-hidden flex flex-col shadow-lg ring-1 ring-white/5 group">
+                <!-- Overlay UI for 3D Canvas -->
+                <div class="absolute top-4 left-4 z-10 pointer-events-none">
+                    <div class="flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+                        <span class="relative flex h-2.5 w-2.5">
+                          <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+                        </span>
+                        <span class="text-xs font-semibold text-gray-200 tracking-wider">AI TUTOR ONLINE</span>
+                    </div>
+                </div>
+                
+                <div class="absolute top-4 right-4 z-10 flex gap-2">
+                    <button class="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white p-2 rounded-lg border border-white/10 transition-colors tooltip" title="Reset Camera">
+                        <i class="ph ph-video-camera"></i>
+                    </button>
+                    <button class="bg-black/40 hover:bg-black/60 backdrop-blur-md text-white p-2 rounded-lg border border-white/10 transition-colors tooltip" title="Toggle Fullscreen">
+                        <i class="ph ph-corners-out"></i>
+                    </button>
+                </div>
+
+                <!-- 3D Canvas injects here -->
+                <canvas id="ai-canvas" class="w-full h-full cursor-grab active:cursor-grabbing outline-none"></canvas>
+                
+                <div class="absolute bottom-4 left-0 w-full text-center pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity">
+                    <p class="text-xs text-gray-400 font-mono">Move mouse to interact • Ready Player Me / Convai Integration Ready</p>
+                </div>
+            </div>
+
+            <!-- Real-time Chat Interface -->
+            <div class="flex-1 flex flex-col rounded-2xl glass-panel overflow-hidden shadow-lg ring-1 ring-white/5">
+                <div class="p-4 border-b border-white/5 bg-white/5 flex items-center justify-between shrink-0">
+                    <h2 class="text-sm font-semibold flex items-center gap-2">
+                        <i class="ph ph-chat-teardrop-dots text-brightstep-primary text-lg"></i>
+                        Live Session Chat
+                    </h2>
+                    <span class="text-xs text-gray-400">Model: Brightstep-Alpha</span>
+                </div>
+
+                <!-- Chat Messages -->
+                <div id="chat-messages" class="flex-1 p-4 overflow-y-auto flex flex-col gap-4">
+                    <!-- Initial AI Greeting -->
+                    <div class="flex items-end gap-2 max-w-[85%]">
+                        <div class="w-8 h-8 rounded-full bg-gradient-to-br from-brightstep-primary to-brightstep-accent shrink-0 flex items-center justify-center">
+                            <i class="ph ph-robot text-white"></i>
+                        </div>
+                        <div class="bg-gray-800 border border-gray-700 text-gray-200 p-3 rounded-2xl rounded-bl-sm text-sm">
+                            <p>Hello! I'm your Brightstep AI Tutor. I can see you're studying Advanced Calculus today. How can I help you visualize the concepts?</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input -->
+                <div class="p-4 border-t border-white/5 bg-black/20 shrink-0">
+                    <form id="chat-form" class="relative flex items-center">
+                        <button type="button" class="absolute left-3 text-gray-400 hover:text-brightstep-primary transition-colors">
+                            <i class="ph ph-paperclip text-lg"></i>
+                        </button>
+                        <input type="text" id="chat-input" placeholder="Ask your AI tutor a question..." class="w-full bg-gray-900 border border-gray-700 rounded-full py-3 pl-10 pr-24 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-brightstep-primary focus:ring-1 focus:ring-brightstep-primary transition-all shadow-inner">
+                        
+                        <div class="absolute right-2 flex items-center gap-1">
+                            <button type="button" id="voice-btn" class="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:text-red-400 hover:bg-red-400/10 transition-colors">
+                                <i class="ph ph-microphone text-lg"></i>
+                            </button>
+                            <button type="submit" class="w-8 h-8 flex items-center justify-center rounded-full bg-brightstep-primary text-white hover:bg-blue-600 transition-colors shadow-lg shadow-blue-500/30">
+                                <i class="ph ph-paper-plane-right text-sm"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column: Materials & Premium -->
+        <div class="w-full lg:w-80 flex flex-col gap-6 shrink-0 h-full overflow-y-auto pb-6 lg:pb-0 hide-scrollbar">
+            
+            <!-- Upgrade / Premium CTA (Instamojo Placeholder) -->
+            <div class="rounded-2xl relative overflow-hidden group shadow-lg ring-1 ring-white/5">
+                <!-- Animated gradient background -->
+                <div class="absolute inset-0 bg-gradient-to-br from-purple-900 via-indigo-900 to-blue-900 opacity-80 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <div class="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white opacity-5 rounded-full blur-xl"></div>
+                
+                <div class="relative p-6 flex flex-col items-center text-center">
+                    <div class="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-full flex items-center justify-center mb-3 border border-white/20">
+                        <i class="ph ph-crown text-2xl text-yellow-400 drop-shadow-md"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-white mb-1 text-glow">Brightstep Pro</h3>
+                    <p class="text-xs text-gray-300 mb-5 leading-relaxed">Unlock unlimited AI voice sessions, 3D visualizations, and priority support.</p>
+                    
+                    <button class="w-full relative py-2.5 rounded-lg font-semibold text-sm overflow-hidden group/btn bg-gradient-to-r from-yellow-500 to-amber-600 text-gray-900 shadow-[0_0_15px_rgba(245,158,11,0.4)] hover:shadow-[0_0_25px_rgba(245,158,11,0.6)] transition-all">
+                        <span class="relative z-10 flex items-center justify-center gap-2">
+                            <i class="ph ph-credit-card"></i> Pay via Instamojo
+                        </span>
+                        <div class="absolute inset-0 h-full w-full scale-0 rounded-lg transition-all duration-300 ease-out group-hover/btn:scale-100 bg-white/20"></div>
+                    </button>
+                    <p class="text-[10px] text-white/50 mt-2 font-mono">Secure API Integration Ready</p>
+                </div>
+            </div>
+
+            <!-- Course Materials Module -->
+            <div class="flex-1 rounded-2xl glass-panel shadow-lg ring-1 ring-white/5 flex flex-col">
+                <div class="p-4 border-b border-white/5 flex items-center justify-between">
+                    <h3 class="text-sm font-bold text-gray-200">Course Materials</h3>
+                    <button class="text-xs text-brightstep-primary hover:text-blue-400">View All</button>
+                </div>
+                <div class="p-2 flex flex-col gap-1">
+                    
+                    <!-- Material Item -->
+                    <a href="#" class="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors group">
+                        <div class="w-10 h-10 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
+                            <i class="ph ph-file-pdf text-xl"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-medium text-gray-200 truncate">Calculus Chapter 4</h4>
+                            <p class="text-xs text-gray-500 truncate">Derivatives & Integrals</p>
+                        </div>
+                        <i class="ph ph-download-simple text-gray-500 group-hover:text-white transition-colors"></i>
+                    </a>
+
+                    <!-- Material Item -->
+                    <a href="#" class="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors group">
+                        <div class="w-10 h-10 rounded-lg bg-green-500/10 text-green-400 flex items-center justify-center group-hover:bg-green-500/20 transition-colors">
+                            <i class="ph ph-presentation-chart text-xl"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-medium text-gray-200 truncate">Physics Mechanics</h4>
+                            <p class="text-xs text-gray-500 truncate">Interactive Slides</p>
+                        </div>
+                        <i class="ph ph-download-simple text-gray-500 group-hover:text-white transition-colors"></i>
+                    </a>
+
+                    <!-- Material Item -->
+                    <a href="#" class="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 transition-colors group">
+                        <div class="w-10 h-10 rounded-lg bg-purple-500/10 text-purple-400 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
+                            <i class="ph ph-video text-xl"></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h4 class="text-sm font-medium text-gray-200 truncate">History Lecture</h4>
+                            <p class="text-xs text-gray-500 truncate">Recorded Session - 45m</p>
+                        </div>
+                        <i class="ph ph-play-circle text-gray-500 group-hover:text-white transition-colors"></i>
+                    </a>
+                    
+                </div>
+                
+                <!-- Quick Tasks -->
+                <div class="mt-auto p-4 border-t border-white/5 bg-white/[0.02]">
+                    <h3 class="text-xs font-semibold text-gray-400 mb-3 uppercase tracking-wider">Today's Goals</h3>
+                    <ul class="space-y-2">
+                        <li class="flex items-center gap-2 text-sm text-gray-300">
+                            <input type="checkbox" class="rounded bg-gray-800 border-gray-600 text-brightstep-primary focus:ring-brightstep-primary focus:ring-offset-gray-900 cursor-pointer">
+                            <span class="line-through opacity-50">Read Math Notes</span>
+                        </li>
+                        <li class="flex items-center gap-2 text-sm text-gray-300">
+                            <input type="checkbox" class="rounded bg-gray-800 border-gray-600 text-brightstep-primary focus:ring-brightstep-primary focus:ring-offset-gray-900 cursor-pointer">
+                            <span>Ask AI about Quantum limits</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+
+    <!-- Background Decorative Elements -->
+    <div class="fixed top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
+        <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-brightstep-primary opacity-5 blur-[120px] rounded-full"></div>
+        <div class="absolute bottom-[-10%] right-[-10%] w-[30%] h-[50%] bg-brightstep-accent opacity-5 blur-[150px] rounded-full"></div>
+    </div>
+
+    <!-- Application Logic (Three.js & Chat) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initThreeJS();
+            initChat();
+        });
+
+        /* =========================================
+           THREE.JS - 3D AI TUTOR PLACEHOLDER
+           ========================================= */
+        let scene, camera, renderer, aiAvatarGroup, headMesh;
+        let mouse = { x: 0, y: 0 };
+        let targetMouse = { x: 0, y: 0 };
+        const canvas = document.getElementById('ai-canvas');
+
+        function initThreeJS() {
+            // 1. Scene Setup
+            scene = new THREE.Scene();
+            // Deep dark blue background to match UI
+            scene.background = new THREE.Color('#050811'); 
+            
+            // Add some fog for depth
+            scene.fog = new THREE.FogExp2('#050811', 0.05);
+
+            // 2. Camera Setup
+            camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
+            camera.position.set(0, 1.5, 6);
+
+            // 3. Renderer Setup
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            // Ensure canvas resizes correctly
+            window.addEventListener('resize', onWindowResize, false);
+
+            // 4. Lighting - Cinematic / Futuristic
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
+            scene.add(ambientLight);
+
+            const mainLight = new THREE.DirectionalLight(0x3B82F6, 1.5); // Blue primary
+            mainLight.position.set(5, 5, 5);
+            scene.add(mainLight);
+
+            const accentLight = new THREE.DirectionalLight(0x8B5CF6, 1.5); // Purple accent
+            accentLight.position.set(-5, 3, -5);
+            scene.add(accentLight);
+            
+            const fillLight = new THREE.PointLight(0xffffff, 0.5);
+            fillLight.position.set(0, -2, 2);
+            scene.add(fillLight);
+
+            // 5. Constructing the AI Avatar Placeholder (Abstract Robot)
+            aiAvatarGroup = new THREE.Group();
+            scene.add(aiAvatarGroup);
+
+            // Materials
+            const bodyMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x111827, 
+                roughness: 0.2, 
+                metalness: 0.8,
+                emissive: 0x0f172a,
+                emissiveIntensity: 0.2
+            });
+            const glowMaterial = new THREE.MeshStandardMaterial({
+                color: 0x3B82F6,
+                emissive: 0x3B82F6,
+                emissiveIntensity: 1,
+                roughness: 0.1,
+                metalness: 0.1
+            });
+
+            // Head
+            const headGeo = new THREE.SphereGeometry(0.8, 32, 32);
+            headMesh = new THREE.Mesh(headGeo, bodyMaterial);
+            headMesh.position.y = 2;
+            aiAvatarGroup.add(headMesh);
+
+            // Eyes / Visor (Glowing)
+            const visorGeo = new THREE.BoxGeometry(0.8, 0.2, 0.8);
+            const visor = new THREE.Mesh(visorGeo, glowMaterial);
+            visor.position.set(0, 0.1, 0.5);
+            headMesh.add(visor); // Attach to head so it moves with it
+
+            // Torso
+            const torsoGeo = new THREE.CylinderGeometry(0.7, 0.5, 1.5, 32);
+            const torso = new THREE.Mesh(torsoGeo, bodyMaterial);
+            torso.position.y = 0.5;
+            aiAvatarGroup.add(torso);
+
+            // Floating Base Ring (Holographic feel)
+            const ringGeo = new THREE.TorusGeometry(1.2, 0.05, 16, 64);
+            const ring = new THREE.Mesh(ringGeo, glowMaterial);
+            ring.position.y = -0.5;
+            ring.rotation.x = Math.PI / 2;
+            aiAvatarGroup.add(ring);
+            
+            // Add some particle/data nodes floating around
+            const particlesGeo = new THREE.BufferGeometry();
+            const particlesCount = 100;
+            const posArray = new Float32Array(particlesCount * 3);
+            for(let i = 0; i < particlesCount * 3; i++) {
+                posArray[i] = (Math.random() - 0.5) * 10;
+            }
+            particlesGeo.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+            const particlesMat = new THREE.PointsMaterial({
+                size: 0.05,
+                color: 0x8B5CF6,
+                transparent: true,
+                opacity: 0.6
+            });
+            const particlesMesh = new THREE.Points(particlesGeo, particlesMat);
+            scene.add(particlesMesh);
+
+            // 6. Interaction - Mouse Tracking
+            const container = canvas.parentElement;
+            container.addEventListener('mousemove', (event) => {
+                const rect = container.getBoundingClientRect();
+                // Normalized Device Coordinates (-1 to +1)
+                targetMouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+                targetMouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            });
+            
+            // Reset look on mouse leave
+            container.addEventListener('mouseleave', () => {
+                targetMouse.x = 0;
+                targetMouse.y = 0;
+            });
+
+            // 7. Animation Loop
+            const clock = new THREE.Clock();
+
+            function animate() {
+                requestAnimationFrame(animate);
+                
+                const time = clock.getElapsedTime();
+
+                // Smoothly interpolate mouse for fluid head movement
+                mouse.x += (targetMouse.x - mouse.x) * 0.1;
+                mouse.y += (targetMouse.y - mouse.y) * 0.1;
+
+                // Move Head based on mouse (Interactive)
+                headMesh.rotation.y = -mouse.x * 1.5; // Look left/right
+                headMesh.rotation.x = mouse.y * 0.8;  // Look up/down
+
+                // Idle Breathing / Hovering Animation
+                aiAvatarGroup.position.y = Math.sin(time * 2) * 0.1;
+                ring.rotation.z = time * 0.5; // Rotate base ring
+                ring.scale.setScalar(1 + Math.sin(time * 4) * 0.05); // Pulsate ring
+                
+                // Rotate background particles slowly
+                particlesMesh.rotation.y = time * 0.05;
+
+                renderer.render(scene, camera);
+            }
+            animate();
+        }
+
+        function onWindowResize() {
+            const container = canvas.parentElement;
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        /* =========================================
+           CHAT INTERFACE LOGIC
+           ========================================= */
+        function initChat() {
+            const chatForm = document.getElementById('chat-form');
+            const chatInput = document.getElementById('chat-input');
+            const chatMessages = document.getElementById('chat-messages');
+            const voiceBtn = document.getElementById('voice-btn');
+            
+            let isRecording = false;
+
+            // Simulated AI Responses for demo purposes
+            const aiResponses = [
+                "That's a great question! Based on your current progress in Calculus, we should review the chain rule first.",
+                "I can generate a 3D graph for that equation if you'd like to see it visually.",
+                "Remember, consistency is key. You've been doing great this week. Let's break this problem down step-by-step.",
+                "Would you like me to pull up the notes from Chapter 4 for reference?"
+            ];
+
+            function addMessage(text, isUser = false) {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `flex items-end gap-2 max-w-[85%] ${isUser ? 'ml-auto flex-row-reverse' : ''}`;
+                
+                // Avatar
+                const avatar = document.createElement('div');
+                avatar.className = `w-8 h-8 rounded-full shrink-0 flex items-center justify-center ${isUser ? 'bg-gray-700' : 'bg-gradient-to-br from-brightstep-primary to-brightstep-accent'}`;
+                avatar.innerHTML = isUser ? '<i class="ph ph-user text-gray-300"></i>' : '<i class="ph ph-robot text-white"></i>';
+                
+                // Bubble
+                const bubble = document.createElement('div');
+                bubble.className = `p-3 text-sm ${isUser ? 'bg-brightstep-primary text-white rounded-2xl rounded-br-sm' : 'bg-gray-800 border border-gray-700 text-gray-200 rounded-2xl rounded-bl-sm'}`;
+                bubble.innerHTML = `<p>${text}</p>`;
+
+                msgDiv.appendChild(avatar);
+                msgDiv.appendChild(bubble);
+                
+                chatMessages.appendChild(msgDiv);
+                
+                // Scroll to bottom smoothly
+                chatMessages.scrollTo({
+                    top: chatMessages.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
+
+            // Handle Text Submission
+            chatForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const text = chatInput.value.trim();
+                if (!text) return;
+
+                // Add User Message
+                addMessage(text, true);
+                chatInput.value = '';
+
+                // Simulate AI Thinking & Responding
+                setTimeout(() => {
+                    // Make the 3D avatar "nod" when responding
+                    if(headMesh) {
+                        const originalX = headMesh.rotation.x;
+                        headMesh.rotation.x = originalX + 0.3;
+                        setTimeout(() => headMesh.rotation.x = originalX, 300);
+                    }
+
+                    const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+                    addMessage(randomResponse, false);
+                }, 1000 + Math.random() * 1000); // 1-2 second delay
+            });
+
+            // Handle Fake Voice Recording
+            voiceBtn.addEventListener('click', () => {
+                isRecording = !isRecording;
+                const icon = voiceBtn.querySelector('i');
+                
+                if (isRecording) {
+                    voiceBtn.classList.add('bg-red-500/20', 'text-red-400');
+                    voiceBtn.classList.remove('text-gray-400', 'hover:bg-red-400/10');
+                    icon.classList.add('animate-pulse');
+                    chatInput.placeholder = "Listening...";
+                    chatInput.disabled = true;
+                } else {
+                    voiceBtn.classList.remove('bg-red-500/20', 'text-red-400');
+                    voiceBtn.classList.add('text-gray-400', 'hover:bg-red-400/10');
+                    icon.classList.remove('animate-pulse');
+                    chatInput.placeholder = "Ask your AI tutor a question...";
+                    chatInput.disabled = false;
+                    
+                    // Simulate transcribed text
+                    chatInput.value = "Can you explain the visualization above?";
+                    chatInput.focus();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+{
+  "name": "ai-teach-crossplatform",
+  "version": "1.0.0",
+  "description": "AI TEACH — Unified Cross-Platform Mobile (Android) & Desktop (Windows) Application",
+  "main": "desktop-app/main.js",
+  "scripts": {
+    "cap:sync": "npx cap sync",
+    "cap:open:android": "npx cap open android",
+    "build:android:aab": "gradle :app:bundleRelease",
+    "build:android:apk": "gradle :app:assembleRelease",
+    "desktop:start": "electron desktop-app/main.js",
+    "desktop:build:msix": "electron-builder --win msix",
+    "desktop:build:exe": "electron-builder --win nsis"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.0.0",
+    "@capacitor/cli": "^6.0.0",
+    "@capacitor/core": "^6.0.0"
+  },
+  "devDependencies": {
+    "electron": "^29.1.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.aistudio.brightstep.kytuv",
+    "productName": "AI TEACH",
+    "directories": {
+      "output": "dist/desktop"
+    },
+    "files": [
+      "desktop-app/**/*",
+      "public/**/*"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "msix",
+          "arch": ["x64"]
+        },
+        {
+          "target": "nsis",
+          "arch": ["x64"]
+        }
+      ],
+      "icon": "desktop-app/icon.png"
+    },
+    "msix": {
+      "identityName": "AITeach.Interactive3DTutor",
+      "publisher": "CN=AITeachStudio",
+      "publisherDisplayName": "AI Teach Studio",
+      "languages": ["hi-IN", "en-US"]
+    }
+  }
+}

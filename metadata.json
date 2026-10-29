@@ -1,0 +1,6 @@
+{
+  "name": "Brightstep",
+  "description": "AI study companion and tutor to analyze documents, learn step-by-step, practice quizzes, and visualize concepts.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
